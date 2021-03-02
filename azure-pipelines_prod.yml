@@ -1,0 +1,31 @@
+variables:
+- group: Snowflake Account Variables
+
+trigger:
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - demo/citibike
+  
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.6'
+
+- script: | 
+    python -m pip install --upgrade pip
+    pip install snowchange --upgrade
+  displayName: 'Install Modules'
+
+- task: PowerShell@2
+  displayName: Add environment variable
+  inputs:
+    targetType: 'inline'
+    script: |
+      Write-Host "Making the Snowflake_password available as an environment variable."
+      Write-Host "##vso[task.setvariable variable=SNOWSQL_PWD;]$(password)"
+
+- script: snowchange -e prod -n -f demo  --snowflake-region us-east-1 -a $(SNOWFLAKE_ACCOUNT) -u $(SNOWFLAKE_USER) -r $(SNOWFLAKE_ROLE) -w $(SNOWFLAKE_WAREHOUSE) 
+  displayName: 'Main Code'

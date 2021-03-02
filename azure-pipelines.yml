@@ -1,5 +1,5 @@
 variables:
-- group: my-variable-group
+- group: Snowflake Account Variables
 
 trigger:
   branches:
